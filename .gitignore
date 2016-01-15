@@ -1,2 +1,4 @@
-NeuralNetwork.iml
+*.iml
 .idea/
+.gradle/
+build/
