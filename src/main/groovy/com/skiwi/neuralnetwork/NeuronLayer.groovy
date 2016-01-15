@@ -16,7 +16,7 @@ class NeuronLayer {
     }
 
     static NeuronLayer create(int neuronCount) {
-        Neuron[] neurons = new Neuron[neuronCount]
+        def neurons = new Neuron[neuronCount]
         neurons.eachWithIndex{ n, i -> neurons[i] = new Neuron() }
         new NeuronLayer(neurons)
     }
