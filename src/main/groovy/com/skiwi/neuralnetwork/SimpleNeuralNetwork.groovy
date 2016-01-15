@@ -20,7 +20,7 @@ class SimpleNeuralNetwork implements NeuralNetwork {
     }
 
     @Override
-    void learn(double learningRate) {
+    void learn(LearningData learningData, double learningRate) {
         throw new UnsupportedOperationException()
     }
 
