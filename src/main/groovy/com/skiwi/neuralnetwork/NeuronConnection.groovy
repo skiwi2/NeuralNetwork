@@ -13,4 +13,20 @@ class NeuronConnection {
         this.input = input
         this.output = output
     }
+
+    double getInValue() {
+        weight * input.value
+    }
+
+    double getOutValue() {
+        weight * output.value
+    }
+
+    double getOutDelta() {
+        weight * output.delta
+    }
+
+    void updateWeight(double learningRate) {
+        weight += learningRate * input.value * output.delta
+    }
 }

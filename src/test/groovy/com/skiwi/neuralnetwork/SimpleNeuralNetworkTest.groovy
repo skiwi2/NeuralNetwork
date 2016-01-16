@@ -2,6 +2,11 @@ package com.skiwi.neuralnetwork
 
 import spock.lang.Specification
 
+import static com.skiwi.neuralnetwork.ActivationFunctions.SIGMOID_DERIVATIVE_FUNCTION
+import static com.skiwi.neuralnetwork.ActivationFunctions.SIGMOID_FUNCTION
+import static spock.util.matcher.HamcrestMatchers.closeTo
+import static spock.util.matcher.HamcrestSupport.that
+
 /**
  * @author Frank van Heeswijk
  */
@@ -36,7 +41,54 @@ class SimpleNeuralNetworkTest extends Specification {
             assert it.outputs.output.toSet() == secondNeuronSet
         }
         second.neurons.each { it ->
-            assert it.inputs.input.toSet() == firstNeuronSet
+            //ignore bias node
+            assert it.inputs.input.findAll { it.value != 1.0d }.toSet() == firstNeuronSet
+        }
+    }
+
+    void "test AND-function without hidden nodes"() {
+        when: "neural network is trained for the AND-function"
+        def neuralNetwork = new SimpleNeuralNetwork(2, 1)
+        def data = [
+            [[0d, 0d] as double[], [0d] as double[]],
+            [[0d, 1d] as double[], [0d] as double[]],
+            [[1d, 0d] as double[], [0d] as double[]],
+            [[1d, 1d] as double[], [1d] as double[]]
+        ]
+        def learningData = LearningData.fromStream(data.stream(), { new LearningDatum(it[0], it[1]) })
+        neuralNetwork.learn(learningData, 0.7d, SIGMOID_FUNCTION, SIGMOID_DERIVATIVE_FUNCTION, 100000)
+
+        then: "outputs should be correct"
+        doubleArrayIsCloseTo(neuralNetwork.query([0d, 0d] as double[], SIGMOID_FUNCTION), [0d] as double[], 0.01d)
+        doubleArrayIsCloseTo(neuralNetwork.query([0d, 1d] as double[], SIGMOID_FUNCTION), [0d] as double[], 0.01d)
+        doubleArrayIsCloseTo(neuralNetwork.query([1d, 0d] as double[], SIGMOID_FUNCTION), [0d] as double[], 0.01d)
+        doubleArrayIsCloseTo(neuralNetwork.query([1d, 1d] as double[], SIGMOID_FUNCTION), [1d] as double[], 0.01d)
+    }
+
+    void "test XOR-function with hidden nodes"() {
+        when: "neural network is trained for the XOR-function"
+        def neuralNetwork = new SimpleNeuralNetwork(2, 1, 2)
+        def data = [
+            [[0d, 0d] as double[], [0d] as double[]],
+            [[0d, 1d] as double[], [1d] as double[]],
+            [[1d, 0d] as double[], [1d] as double[]],
+            [[1d, 1d] as double[], [0d] as double[]]
+        ]
+        def learningData = LearningData.fromStream(data.stream(), { new LearningDatum(it[0], it[1]) })
+        neuralNetwork.learn(learningData, 0.7d, SIGMOID_FUNCTION, SIGMOID_DERIVATIVE_FUNCTION, 100000)
+
+        then: "outputs should be correct"
+        doubleArrayIsCloseTo(neuralNetwork.query([0d, 0d] as double[], SIGMOID_FUNCTION), [0d] as double[], 0.01d)
+        doubleArrayIsCloseTo(neuralNetwork.query([0d, 1d] as double[], SIGMOID_FUNCTION), [1d] as double[], 0.01d)
+        doubleArrayIsCloseTo(neuralNetwork.query([1d, 0d] as double[], SIGMOID_FUNCTION), [1d] as double[], 0.01d)
+        doubleArrayIsCloseTo(neuralNetwork.query([1d, 1d] as double[], SIGMOID_FUNCTION), [0d] as double[], 0.01d)
+    }
+
+
+    def doubleArrayIsCloseTo(double[] first, double[] second, double error) {
+        assert first.length == second.length
+        first.eachWithIndex{ d, i ->
+            assert that(d, closeTo(second[i], error))
         }
     }
 }

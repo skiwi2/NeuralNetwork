@@ -13,7 +13,7 @@ class LearningData {
         this.data = data
     }
 
-    static LearningData fromStream(Stream<String> stream, Function<String, LearningDatum> converter) {
+    static <T> LearningData fromStream(Stream<T> stream, Function<T, LearningDatum> converter) {
         def data = stream.collect { converter.apply(it) }
         return new LearningData(data)
     }
