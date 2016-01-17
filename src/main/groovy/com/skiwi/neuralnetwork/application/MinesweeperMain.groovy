@@ -21,18 +21,18 @@ class MinesweeperMain {
         def image = ImageIO.read(url)
 
         def data = [
-            [getSubImageGrayScalePixels(image, 619, 617, 39, 39), [1d, 0d, 0d, 0d] as double[]],    //unclicked
-            [getSubImageGrayScalePixels(image, 662, 617, 39, 39), [0d, 1d, 0d, 0d] as double[]],    //clicked
-            [getSubImageGrayScalePixels(image, 790, 241, 39, 39), [0d, 1d, 0d, 0d] as double[]],    //clicked
-            [getSubImageGrayScalePixels(image, 790, 197, 39, 39), [0d, 0d, 1d, 0d] as double[]],    //flag
-            [getSubImageGrayScalePixels(image, 0, 0, 39, 39), [0d, 0d, 0d, 1d] as double[]]         //nothing
+            [getSubImageGrayScalePixels(image, 619, 617, 39, 39), [1d, 0d, 0d] as double[]],    //unclicked
+            [getSubImageGrayScalePixels(image, 662, 617, 39, 39), [0d, 1d, 0d] as double[]],    //clicked
+            [getSubImageGrayScalePixels(image, 790, 241, 39, 39), [0d, 1d, 0d] as double[]],    //clicked
+            [getSubImageGrayScalePixels(image, 790, 197, 39, 39), [0d, 0d, 1d] as double[]],    //flag
+            [getSubImageGrayScalePixels(image, 0, 0, 39, 39), [0d, 0d, 0d] as double[]]         //nothing
         ]
         def learningData = LearningData.fromStream(data.stream(), { new LearningDatum(it[0], it[1]) })
-        def neuralNetwork = new SimpleNeuralNetwork(39 * 39, 4, 40)
+        def neuralNetwork = new SimpleNeuralNetwork(39 * 39, 3, 40)
         neuralNetwork.learn(learningData, 0.5d, SIGMOID_FUNCTION, SIGMOID_DERIVATIVE_FUNCTION, 2000)
 
         println ""
-        println "Identifier: [UNCLICKED, CLICKED, FLAG, NOTHING]"
+        println "Identifier: [UNCLICKED, CLICKED, FLAG]"
         println ""
         println "Test Unclicked: " + neuralNetwork.query(getSubImageGrayScalePixels(image, 619, 617, 39, 39), SIGMOID_FUNCTION)
         println "Test Clicked: " + neuralNetwork.query(getSubImageGrayScalePixels(image, 662, 617, 39, 39), SIGMOID_FUNCTION)
