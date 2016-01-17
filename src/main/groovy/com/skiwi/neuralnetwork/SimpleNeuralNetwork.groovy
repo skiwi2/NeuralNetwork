@@ -2,27 +2,32 @@ package com.skiwi.neuralnetwork
 
 import java.util.function.DoubleUnaryOperator
 
+import static com.skiwi.neuralnetwork.LayerType.HIDDEN
+import static com.skiwi.neuralnetwork.LayerType.INPUT
+import static com.skiwi.neuralnetwork.LayerType.OUTPUT
+
 /**
  * @author Frank van Heeswijk
  */
 class SimpleNeuralNetwork implements NeuralNetwork {
-    NeuronLayer[] layers
+    List<NeuronLayer> layers
 
     SimpleNeuralNetwork(int inputNeuronCount, int outputNeuronCount, int... hiddenNeuronCount) {
         generateNetwork(inputNeuronCount, outputNeuronCount, hiddenNeuronCount)
     }
 
     private void generateNetwork(int inputNeuronCount, int outputNeuronCount, int... hiddenNeuronCount) {
-        layers = [inputNeuronCount, *hiddenNeuronCount, outputNeuronCount].stream()
-            .map({ NeuronLayer.create(it) })
-            .toArray({ i -> new NeuronLayer[i] })
+        layers = []
+        layers << NeuronLayer.create(INPUT, inputNeuronCount)
+        hiddenNeuronCount.each { layers << NeuronLayer.create(HIDDEN, it) }
+        layers << NeuronLayer.create(OUTPUT, outputNeuronCount)
 
         def biasNeuron = new Neuron(value: 1d)
-        for (int i = 1; i < layers.length; i++) {
+        for (int i = 1; i < layers.size(); i++) {
             layers[i].addBiasNode(biasNeuron)
         }
 
-        for (int i = 0; i < layers.length - 1; i++) {
+        for (int i = 0; i < layers.size() - 1; i++) {
             NeuronLayer.connect(layers[i], layers[i + 1])
         }
     }
@@ -40,7 +45,7 @@ class SimpleNeuralNetwork implements NeuralNetwork {
 
                 //forward propagation
                 layers.first().queryVector = queryVector
-                for (int i = 1; i < layers.length; i++) {
+                for (int i = 1; i < layers.size(); i++) {
                     layers[i].forwardPropagate(activationFunction)
                 }
 
@@ -50,10 +55,10 @@ class SimpleNeuralNetwork implements NeuralNetwork {
 
                 //backward propagation
                 layers.last().calculateDeltaValues(activationDerivativeFunction, targetVector)
-                for (int i = layers.length - 2; i >= 0; i--) {
+                for (int i = layers.size() - 2; i >= 0; i--) {
                     layers[i].calculateDeltaValues(activationDerivativeFunction)
                 }
-                for (int i = 1; i < layers.length; i++) {
+                for (int i = 1; i < layers.size(); i++) {
                     layers[i].updateWeights(learningRate)
                 }
             }
@@ -67,7 +72,7 @@ class SimpleNeuralNetwork implements NeuralNetwork {
     @Override
     double[] query(double[] queryVector, DoubleUnaryOperator activationFunction) {
         layers.first().queryVector = queryVector
-        for (int i = 1; i < layers.length; i++) {
+        for (int i = 1; i < layers.size(); i++) {
             layers[i].forwardPropagate(activationFunction)
         }
 

@@ -16,7 +16,7 @@ class SimpleNeuralNetworkTest extends Specification {
         def neuralNetwork = new SimpleNeuralNetwork(100, 10, 40, 20)
 
         then: "network has to be generated correctly"
-        neuralNetwork.layers.length == 4
+        neuralNetwork.layers.size() == 4
         neuralNetwork.layers[0].neurons.length == 100
         neuralNetwork.layers[1].neurons.length == 40
         neuralNetwork.layers[2].neurons.length == 20

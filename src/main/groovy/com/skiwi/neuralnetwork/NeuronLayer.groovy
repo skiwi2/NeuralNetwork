@@ -1,18 +1,22 @@
 package com.skiwi.neuralnetwork
 
-import java.lang.reflect.Array
 import java.util.function.DoubleUnaryOperator
+
+import static com.skiwi.neuralnetwork.LayerType.INPUT
+import static com.skiwi.neuralnetwork.LayerType.OUTPUT
 
 /**
  * @author Frank van Heeswijk
  */
 class NeuronLayer {
+    LayerType layerType
     Neuron[] neurons
 
     NeuronLayer previousLayer
     NeuronLayer nextLayer
 
-    NeuronLayer(Neuron[] neurons) {
+    NeuronLayer(LayerType layerType, Neuron[] neurons) {
+        this.layerType = layerType
         this.neurons = neurons
     }
 
@@ -20,8 +24,10 @@ class NeuronLayer {
         neurons.each { it.initializeWeights(random) }
     }
 
-    //TODO only allow this is if the current NeuronLayer is the input layer
     void setQueryVector(double[] queryVector) {
+        if (layerType != INPUT) {
+            throw new IllegalStateException("This is not an input neuron layer")
+        }
         neurons.eachWithIndex{ neuron, i -> neuron.value = queryVector[i] }
     }
 
@@ -29,8 +35,10 @@ class NeuronLayer {
         neurons.each { it.forwardPropagate(activationFunction) }
     }
 
-    //TODO only allow this if the current NeuronLayer is the output layer
     double[] calculateErrorVector(double[] targetVector) {
+        if (layerType != OUTPUT) {
+            throw new IllegalStateException("This is not an output neuron layer")
+        }
         def errorVector = new double[targetVector.length]
         for (int i = 0; i < targetVector.length; i++) {
             errorVector[i] = targetVector[i] - neurons[i].value
@@ -39,18 +47,14 @@ class NeuronLayer {
     }
 
     void calculateDeltaValues(DoubleUnaryOperator activationDerivativeFunction) {
-        //TODO check if current NeuronLayer is the output layer instead of performing this calculation
-        def outputNeuronCount = Arrays.stream(neurons).mapToInt({ it.outputs.size() }).sum()
-        if (!outputNeuronCount) {
+        if (layerType == OUTPUT) {
             throw new IllegalStateException("This is an output neuron layer")
         }
         neurons.each { it.calculateDeltaValue(activationDerivativeFunction) }
     }
 
     void calculateDeltaValues(DoubleUnaryOperator activationDerivativeFunction, double[] targetVector) {
-        //TODO check if current NeuronLayer is the output layer instead of performing this calculation
-        def outputNeuronCount = Arrays.stream(neurons).mapToInt({ it.outputs.size() }).sum()
-        if (outputNeuronCount) {
+        if (layerType != OUTPUT) {
             throw new IllegalStateException("This is not an output neuron layer")
         }
         def errorVector = calculateErrorVector(targetVector)
@@ -61,8 +65,10 @@ class NeuronLayer {
         neurons.each { it.updateWeights(learningRate) }
     }
 
-    //TODO only allow this is if the current NeuronLayer is the output layer
     double[] getOutputVector() {
+        if (layerType != OUTPUT) {
+            throw new IllegalStateException("This is not an output neuron layer")
+        }
         Arrays.stream(neurons).mapToDouble({ it.value }).toArray()
     }
 
@@ -70,10 +76,10 @@ class NeuronLayer {
         neurons.each { it.inputs << new NeuronConnection(biasNeuron, it) }
     }
 
-    static NeuronLayer create(int neuronCount) {
+    static NeuronLayer create(LayerType layerType, int neuronCount) {
         def neurons = new Neuron[neuronCount]
         neurons.eachWithIndex{ n, i -> neurons[i] = new Neuron() }
-        new NeuronLayer(neurons)
+        new NeuronLayer(layerType, neurons)
     }
 
     static void connect(NeuronLayer first, NeuronLayer second) {
