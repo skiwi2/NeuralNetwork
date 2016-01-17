@@ -13,7 +13,7 @@ class Neuron {
     double delta
 
     void initializeWeights(Random random) {
-        inputs.each { it.weight = random.nextDouble() }
+        inputs.each { it.weight = random.nextDouble() - 0.5d }
     }
 
     double getInputSum() {
