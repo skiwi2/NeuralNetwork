@@ -56,7 +56,7 @@ class SimpleNeuralNetworkTest extends Specification {
             [[1d, 1d] as double[], [1d] as double[]]
         ]
         def learningData = LearningData.fromStream(data.stream(), { new LearningDatum(it[0], it[1]) })
-        neuralNetwork.learn(learningData, 0.7d, SIGMOID_FUNCTION, SIGMOID_DERIVATIVE_FUNCTION, 100000)
+        neuralNetwork.learn(learningData, 0.7d, SIGMOID_FUNCTION, SIGMOID_DERIVATIVE_FUNCTION, 250000)
 
         then: "outputs should be correct"
         doubleArrayIsCloseTo(neuralNetwork.query([0d, 0d] as double[], SIGMOID_FUNCTION), [0d] as double[], 0.01d)
@@ -75,7 +75,7 @@ class SimpleNeuralNetworkTest extends Specification {
             [[1d, 1d] as double[], [0d] as double[]]
         ]
         def learningData = LearningData.fromStream(data.stream(), { new LearningDatum(it[0], it[1]) })
-        neuralNetwork.learn(learningData, 0.7d, SIGMOID_FUNCTION, SIGMOID_DERIVATIVE_FUNCTION, 100000)
+        neuralNetwork.learn(learningData, 0.7d, SIGMOID_FUNCTION, SIGMOID_DERIVATIVE_FUNCTION, 250000)
 
         then: "outputs should be correct"
         doubleArrayIsCloseTo(neuralNetwork.query([0d, 0d] as double[], SIGMOID_FUNCTION), [0d] as double[], 0.01d)

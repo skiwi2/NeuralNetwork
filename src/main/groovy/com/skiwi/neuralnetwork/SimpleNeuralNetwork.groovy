@@ -36,10 +36,13 @@ class SimpleNeuralNetwork implements NeuralNetwork {
     void learn(LearningData learningData, double learningRate, DoubleUnaryOperator activationFunction, DoubleUnaryOperator activationDerivativeFunction, int maxIterations) {
         def random = new Random()
         layers.each { it.initializeNeuronWeights(random) }
-        //TODO this is iterations through the learning data currently, which is actually called epochs
-        def squareError
-        for (int iterations = 0; iterations < maxIterations; iterations++) {
-            learningData.data.each { data ->
+        int iterations = 0
+        outer: while (true) {
+            for (def data : learningData.data) {
+                if (iterations++ == maxIterations) {
+                    break outer
+                }
+
                 def queryVector = data.queryVector
                 def targetVector = data.targetVector
 
@@ -51,7 +54,7 @@ class SimpleNeuralNetwork implements NeuralNetwork {
 
                 //square error calculation
                 def errorVector = layers.last().calculateErrorVector(targetVector)
-                squareError = Arrays.stream(errorVector).map({ Math.pow(it, 2) }).sum()
+                def squareError = Arrays.stream(errorVector).map({ Math.pow(it, 2) }).sum()
 
                 //backward propagation
                 layers.last().calculateDeltaValues(activationDerivativeFunction, targetVector)
@@ -61,10 +64,10 @@ class SimpleNeuralNetwork implements NeuralNetwork {
                 for (int i = 1; i < layers.size(); i++) {
                     layers[i].updateWeights(learningRate)
                 }
-            }
 
-            if (iterations % 100 == 0) {
-                println "Iteration $iterations/$maxIterations: Square error = $squareError"
+                if (iterations % 100 == 0) {
+                    println "Iteration $iterations/$maxIterations, Epoch = ${iterations / learningData.data.size()}, Square error = $squareError"
+                }
             }
         }
     }
