@@ -44,11 +44,19 @@ public class Neuron {
     }
 
     double getInputSum() {
-        return inputs.stream().mapToDouble(NeuronConnection::getInValue).sum();
+        double sum = 0d;
+        for (NeuronConnection input : inputs) {
+            sum += input.getInValue();
+        }
+        return sum;
     }
 
     double getWeightedOutputDelta() {
-        return outputs.stream().mapToDouble(NeuronConnection::getOutDelta).sum();
+        double sum = 0d;
+        for (NeuronConnection output : outputs) {
+            sum += output.getOutDelta();
+        }
+        return sum;
     }
 
     void forwardPropagate(DoubleUnaryOperator activationFunction) {
@@ -70,6 +78,8 @@ public class Neuron {
     }
 
     void updateWeights(double learningRate) {
-        inputs.forEach(it -> it.updateWeight(learningRate));
+        for (NeuronConnection input : inputs) {
+            input.updateWeight(learningRate);
+        }
     }
 }

@@ -61,7 +61,10 @@ public class SimpleNeuralNetwork implements NeuralNetwork {
 
                 //square error calculation
                 double[] errorVector = layers.get(layers.size() - 1).calculateErrorVector(targetVector);
-                double squareError = Arrays.stream(errorVector).map(it -> Math.pow(it, 2d)).sum();
+                double squareError = 0d;
+                for (double error : errorVector) {
+                    squareError += Math.pow(error, 2d);
+                }
 
                 //backward propagation
                 layers.get(layers.size() - 1).calculateDeltaValues(activationDerivativeFunction, targetVector);
