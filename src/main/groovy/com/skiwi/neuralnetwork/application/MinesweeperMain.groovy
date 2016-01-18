@@ -9,7 +9,7 @@ import java.awt.image.BufferedImage
 import java.util.stream.DoubleStream
 
 import static com.skiwi.neuralnetwork.ActivationFunctions.SIGMOID_FUNCTION
-import static com.skiwi.neuralnetwork.ActivationFunctions.getSIGMOID_DERIVATIVE_FUNCTION
+import static com.skiwi.neuralnetwork.ActivationFunctions.SIGMOID_DERIVATIVE_FUNCTION
 
 /**
  * @author Frank van Heeswijk
@@ -28,7 +28,7 @@ class MinesweeperMain {
             [getSubImageGrayScalePixels(image, 0, 0, 39, 39), [0d, 0d, 0d] as double[]]         //nothing
         ]
         def learningData = LearningData.fromStream(data.stream(), { new LearningDatum(it[0], it[1]) })
-        def neuralNetwork = new SimpleNeuralNetwork(39 * 39, 3, 40)
+        def neuralNetwork = new SimpleNeuralNetwork(39 * 39, 3, 200)
         neuralNetwork.learn(learningData, 0.5d, SIGMOID_FUNCTION, SIGMOID_DERIVATIVE_FUNCTION, 2000)
 
         println ""

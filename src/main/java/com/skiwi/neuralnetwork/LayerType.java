@@ -1,9 +1,9 @@
-package com.skiwi.neuralnetwork
+package com.skiwi.neuralnetwork;
 
 /**
  * @author Frank van Heeswijk
  */
-enum LayerType {
+public enum LayerType {
     INPUT,
     OUTPUT,
     HIDDEN
