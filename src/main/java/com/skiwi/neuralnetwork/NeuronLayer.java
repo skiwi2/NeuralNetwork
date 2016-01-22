@@ -107,7 +107,11 @@ public class NeuronLayer {
         if (layerType != OUTPUT) {
             throw new IllegalStateException("This is not an output neuron layer");
         }
-        return Arrays.stream(neurons).mapToDouble(Neuron::getValue).toArray();
+        double[] outputVector = new double[neurons.length];
+        for (int i = 0; i < neurons.length; i++) {
+            outputVector[i] = neurons[i].getValue();
+        }
+        return outputVector;
     }
 
     void addBiasNode(Neuron biasNeuron) {

@@ -29,7 +29,7 @@ class MinesweeperMain {
         ]
         def learningData = LearningData.fromStream(data.stream(), { new LearningDatum(it[0], it[1]) })
         def neuralNetwork = new SimpleNeuralNetwork(39 * 39, 3, 40)
-        neuralNetwork.learn(learningData, 0.5d, SIGMOID_FUNCTION, SIGMOID_DERIVATIVE_FUNCTION, 2000)
+        neuralNetwork.learn(learningData, 0.1d, SIGMOID_FUNCTION, SIGMOID_DERIVATIVE_FUNCTION, 20000)
 
         println ""
         println "Identifier: [UNCLICKED, CLICKED, FLAG]"

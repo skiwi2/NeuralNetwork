@@ -44,6 +44,8 @@ public class SimpleNeuralNetwork implements NeuralNetwork {
         Random random = new Random();
         layers.forEach(it -> it.initializeNeuronWeights(random));
         int iterations = 0;
+        int epochSize = learningData.getData().size();
+        double currentLoss = 0d;
         outer: while (true) {
             for (LearningDatum data : learningData.getData()) {
                 if (iterations++ == maxIterations) {
@@ -65,6 +67,7 @@ public class SimpleNeuralNetwork implements NeuralNetwork {
                 for (double error : errorVector) {
                     squareError += Math.pow(error, 2d);
                 }
+                currentLoss += squareError;
 
                 //backward propagation
                 layers.get(layers.size() - 1).calculateDeltaValues(activationDerivativeFunction, targetVector);
@@ -75,8 +78,13 @@ public class SimpleNeuralNetwork implements NeuralNetwork {
                     layers.get(i).updateWeights(learningRate);
                 }
 
-                if (iterations % 100 == 0) {
-                    System.out.println("Iteration " + iterations + "/" + maxIterations + ", Epoch = " + (iterations / learningData.getData().size()) + ", Square error = " + squareError);
+//                if (iterations % 100 == 0) {
+//                    System.out.println("Iteration " + iterations + "/" + maxIterations + ", Epoch = " + (iterations * 1d / learningData.getData().size()) + ", Square error = " + squareError);
+//                }
+
+                if (iterations % epochSize == 0) {
+                    System.out.println("Epoch " + (iterations / epochSize) + ", cost = " + (currentLoss / (2d * epochSize)));
+                    currentLoss = 0d;
                 }
             }
         }

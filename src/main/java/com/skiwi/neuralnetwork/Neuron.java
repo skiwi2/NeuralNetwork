@@ -40,7 +40,10 @@ public class Neuron {
     }
 
     void initializeWeights(Random random) {
-        inputs.forEach(it -> it.setWeight(random.nextDouble() - 0.5d));
+//        double r = 1d / Math.sqrt(inputs.size());
+//        double randomWeight = r - (random.nextDouble() * 2 * r);
+//        inputs.forEach(it -> it.setWeight(randomWeight));
+        inputs.forEach(it -> it.setWeight(random.nextGaussian()));
     }
 
     double getInputSum() {
